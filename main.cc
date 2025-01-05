@@ -1,11 +1,36 @@
 #include <drogon/drogon.h>
-int main() {
-    //Set HTTP listener address and port
-    drogon::app().addListener("0.0.0.0", 5555);
-    //Load config file
-    //drogon::app().loadConfigFile("../config.json");
-    //drogon::app().loadConfigFile("../config.yaml");
-    //Run HTTP framework,the method will block in the internal event loop
-    drogon::app().run();
-    return 0;
+#include <json/value.h>
+
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <ostream>
+#include <print>
+
+#include "include/StoredUser.hpp"
+
+auto main() -> int {
+  // Configure Drogon app
+  std::filesystem::create_directory(std::filesystem::current_path() / "data");
+  LoadUsers(std::filesystem::current_path() / "data");
+  std::println("Entering server");
+
+  drogon::app()
+      .loadConfigFile("./config.json")
+      .setDocumentRoot("./static")
+      .setUploadPath("./uploads")
+      .addListener("0.0.0.0", 8080)
+      .setLogPath("./")
+      .setLogLevel(
+          trantor::Logger::kDebug)  // Set to Debug for more information
+      .enableSession(1200)          // Enable sessions with 20 minute timeout
+      .registerPostHandlingAdvice([](drogon::HttpRequestPtr const &req,
+                                     drogon::HttpResponsePtr const &resp) {
+        resp->addHeader("Access-Control-Allow-Origin", "*");
+        resp->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        resp->addHeader("Access-Control-Allow-Headers", "Content-Type");
+      })
+      .run();
+
+  return 0;
 }
