@@ -1,0 +1,154 @@
+{
+  "$schema": "https://raw.githubusercontent.com/spdx/spdx-spec/v2.2.1/schemas/spdx-schema.json",
+  "spdxVersion": "SPDX-2.2",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "documentNamespace": "https://spdx.org/spdxdocs/trantor-x64-linux-1.5.22-f4e74373-8d61-4394-ab19-0983fd841c1e",
+  "name": "trantor:x64-linux@1.5.22 f561c9e21f416569d7147bb948be71443c723a281538ddca446bb3be164ce4c2",
+  "creationInfo": {
+    "creators": [
+      "Tool: vcpkg-2024-12-09-1005b78fa1bf1dde1a20c2734cba4ea61ca94d9a"
+    ],
+    "created": "2025-01-02T20:44:36Z"
+  },
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "GENERATES",
+      "relatedSpdxElement": "SPDXRef-binary"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-0"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-1"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-2"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-3"
+    },
+    {
+      "spdxElementId": "SPDXRef-binary",
+      "relationshipType": "GENERATED_FROM",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-0",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-1",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-2",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-3",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    }
+  ],
+  "packages": [
+    {
+      "name": "trantor",
+      "SPDXID": "SPDXRef-port",
+      "versionInfo": "1.5.22",
+      "downloadLocation": "git+https://github.com/microsoft/vcpkg@171e9e59a73d94138de424aeb566491c73c6a25c",
+      "homepage": "https://github.com/an-tao/trantor",
+      "licenseConcluded": "BSD-2-Clause",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "description": "A non-blocking I/O cross-platform TCP network library, using C++14",
+      "comment": "This is the port (recipe) consumed by vcpkg."
+    },
+    {
+      "name": "trantor:x64-linux",
+      "SPDXID": "SPDXRef-binary",
+      "versionInfo": "f561c9e21f416569d7147bb948be71443c723a281538ddca446bb3be164ce4c2",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "BSD-2-Clause",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "comment": "This is a binary package built by vcpkg."
+    },
+    {
+      "SPDXID": "SPDXRef-resource-0",
+      "name": "an-tao/trantor",
+      "downloadLocation": "git+https://github.com/an-tao/trantor@v1.5.22",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "03e7d76f0817209ba0886c78ea30c537345699fa8aa2e531b03a7a261deddda73bdd030e513bfc63d2ad55a32c94a2742d872a07d24eb8bcd938615131173d68"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "fileName": ".//home/eugeniusz/.cache/vcpkg/registries/git-trees/171e9e59a73d94138de424aeb566491c73c6a25c/001-disable-werror.patch",
+      "SPDXID": "SPDXRef-file-0",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "b81b2c937e4564445fa4278de451ace6652e1b5404a0f32ec6a1bd2a77e8b23c"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": ".//home/eugeniusz/.cache/vcpkg/registries/git-trees/171e9e59a73d94138de424aeb566491c73c6a25c/portfile.cmake",
+      "SPDXID": "SPDXRef-file-1",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "94673219fe6b7a31ff3327ed94a4d6702386a9313c25af7e2e8b41d02bd072aa"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": ".//home/eugeniusz/.cache/vcpkg/registries/git-trees/171e9e59a73d94138de424aeb566491c73c6a25c/vcpkg.json",
+      "SPDXID": "SPDXRef-file-2",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "9243feccb06134ea1feb39f3e477bf6bd794eafb7f3c92663df8905bc643a697"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": ".//home/eugeniusz/.cache/vcpkg/registries/git-trees/171e9e59a73d94138de424aeb566491c73c6a25c/000-fix-deps.patch",
+      "SPDXID": "SPDXRef-file-3",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "260ee1b73180a6db565aef7f380271134f60bee697979c317e8cd0558425c779"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    }
+  ]
+}

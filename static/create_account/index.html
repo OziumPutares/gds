@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account</title>
+    <style>
+      /* Matching the style of our login page for consistency */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+      }
+
+      .create-account-form {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #1a73e8;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+
+      .password-requirements {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      .error,
+      .success {
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .error {
+        background-color: #ffebee;
+        color: #c62828;
+      }
+
+      .success {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: #1557b0;
+      }
+
+      .login-link {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .login-link a {
+        color: #1a73e8;
+        text-decoration: none;
+      }
+
+      .login-link a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="create-account-form">
+        <h2>Create Account</h2>
+        <div id="message" class="hidden"></div>
+        <form id="createAccountForm">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              required
+              minlength="3"
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              minlength="8"
+            />
+            <div class="password-requirements">
+              Password must be at least 8 characters long
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              required
+            />
+          </div>
+          <button type="submit">Create Account</button>
+        </form>
+        <div class="login-link">
+          Already have an account? <a href="/login">Login here</a>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Utility function to hash passwords using Web Crypto API
+      async function hashPassword(password, salt) {
+        const encoder = new TextEncoder();
+        const saltedPassword = `${password}${salt}`;
+        const data = encoder.encode(saltedPassword);
+
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const createAccountForm = document.getElementById("createAccountForm");
+        const messageElement = document.getElementById("message");
+        const salt = "demofixed_salt";
+
+        function showMessage(text, isError = false) {
+          messageElement.textContent = text;
+          messageElement.classList.remove("hidden", "success", "error");
+          messageElement.classList.add(isError ? "error" : "success");
+        }
+
+        createAccountForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+          if (password !== confirmPassword) {
+            showMessage("Passwords do not match", true);
+            return;
+          }
+
+          try {
+            // Log the request being sent
+            console.log("Sending account creation request...");
+
+            const hashedPassword = await hashPassword(password, salt);
+            const requestBody = {
+              username,
+              hashedPassword,
+              salt,
+            };
+
+            console.log("Request body:", requestBody);
+
+            const response = await fetch("/api/createAccount", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+              body: JSON.stringify(requestBody),
+            });
+
+            // Log the raw response
+            console.log("Response status:", response.status);
+            console.log(
+              "Response headers:",
+              Object.fromEntries(response.headers),
+            );
+
+            // Get the raw text first
+            const rawText = await response.text();
+            console.log("Raw response:", rawText);
+
+            // Try to parse as JSON if possible
+            let data;
+            try {
+              data = JSON.parse(rawText);
+              console.log("Parsed JSON response:", data);
+            } catch (parseError) {
+              console.error("JSON parse error:", parseError);
+              showMessage(
+                "Server returned invalid response format. Check console for details.",
+                true,
+              );
+              return;
+            }
+
+            if (data.success) {
+              showMessage(
+                "Account created successfully! Redirecting to login...",
+              );
+              setTimeout(() => {
+                window.location.href = "/login";
+              }, 2000);
+            } else {
+              showMessage(data.message || "Failed to create account", true);
+            }
+          } catch (error) {
+            console.error("Account creation error:", error);
+            showMessage(`Error: ${error.message}`, true);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

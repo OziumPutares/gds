@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en" class="govuk-template login/js-enabled">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.1.0/fingerprint2.min.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b0c0c" />
+    <title>Sign in using Government Gateway - GOV.UK</title>
+
+    <!-- Favicons -->
+    <link rel="icon" sizes="48x48" href="assets/images/favicon.ico" />
+    <link
+      rel="icon"
+      sizes="any"
+      href="assets/images/favicon.svg"
+      type="image/svg+xml"
+    />
+    <link
+      rel="mask-icon"
+      href="assets/images/govuk-icon-mask.svg"
+      color="#0b0c0c"
+    />
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="login/css/govuk-frontend.min.css" />
+    <link rel="stylesheet" href="login/css/scp.css" />
+
+    <!-- JavaScript -->
+    <script src="login/js/page-start.js" defer></script>
+  </head>
+  <body class="govuk-template__body govuk-frontend-supported">
+    <!-- Header -->
+    <header class="govuk-header" role="banner">
+      <div class="govuk-header__container govuk-width-container">
+        <div class="govuk-header__logo">
+          <a
+            href="https://www.gov.uk"
+            class="govuk-header__link govuk-header__link--homepage"
+          >
+            <svg
+              role="img"
+              focusable="false"
+              class="govuk-header__logotype"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 148 30"
+              height="30"
+              width="148"
+              aria-label="GOV.UK"
+            >
+              <title>GOV.UK</title>
+              <path d="..."></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="govuk-width-container">
+      <main
+        class="govuk-main-wrapper govuk-!-padding-top-4"
+        id="main-content"
+        role="main"
+      >
+        <h1 class="govuk-heading-xl">Sign in using Government Gateway</h1>
+
+        <!-- Login Form -->
+        <form id="loginForm" action="/login" method="POST">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="username">
+              Government Gateway user ID
+            </label>
+            <div class="govuk-hint">This could be up to 12 characters.</div>
+            <input
+              class="govuk-input govuk-!-width-one-half"
+              id="username"
+              name="user_id"
+              type="text"
+              maxlength="22"
+              autocomplete="username"
+              required
+            />
+          </div>
+
+          <div class="govuk-form-group govuk-password-input">
+            <label class="govuk-label" for="password"> Password </label>
+            <input
+              class="govuk-input govuk-login/js-password-input govuk-password-input__input"
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+
+          <button type="submit" class="govuk-button govuk-!-margin-top-3">
+            Sign in
+          </button>
+        </form>
+
+        <!-- Error Message and Attempts List -->
+        <div id="error-message" class="govuk-error-message hidden"></div>
+        <ul id="login-attempts"></ul>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="govuk-footer" role="contentinfo">
+      <div class="govuk-width-container">
+        <div class="govuk-footer__meta">
+          <ul class="govuk-footer__inline-list">
+            <li class="govuk-footer__inline-list-item">
+              <a href="/accessibility" class="govuk-footer__link"
+                >Accessibility</a
+              >
+            </li>
+            <li class="govuk-footer__inline-list-item">
+              <a href="/cookies" class="govuk-footer__link">Cookies</a>
+            </li>
+            <li class="govuk-footer__inline-list-item">
+              <a href="/privacy" class="govuk-footer__link">Privacy</a>
+            </li>
+            <li class="govuk-footer__inline-list-item">
+              <a href="/terms" class="govuk-footer__link">Terms</a>
+            </li>
+          </ul>
+          <span class="govuk-footer__licence-description">
+            All content is available under the
+            <a
+              href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+              class="govuk-footer__link"
+              >Open Government Licence v3.0</a
+            >, except where otherwise stated.
+          </span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="login/js/page-complete.js" defer></script>
+    <script src="login/js/device-profile.js" defer></script>
+    <script src="login/js/login.js" defer></script>
+    <!-- Include the login.login/js file here -->
+  </body>
+</html>

@@ -1,0 +1,8 @@
+Package: drogon
+Version: 1.9.8
+Depends: brotli, jsoncpp, libuuid, trantor, vcpkg-cmake, vcpkg-cmake-config, zlib
+Architecture: x64-linux
+Multi-Arch: same
+Abi: a1b2bf6c7da106a25914686acd53cb852c6e181a5df57cf152acf5ee7d5dfefa
+Description: A C++14/17 based HTTP web application framework running on Linux/macOS/Unix/Windows
+Status: install ok half-installed

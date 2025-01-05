@@ -1,0 +1,206 @@
+@charset "UTF-8";
+#cy:target, #cy:target main {
+  display: block;
+}
+#cy:target + #en-GB {
+  display: none;
+}
+[data-only-show^=".match"] [hidden] {
+  display: none !important;
+}
+.scp-horizontal-scroll[role=region][tabindex] {
+  max-width: 100%;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+.scp-horizontal-scroll[role=region][tabindex]:focus {
+  outline: 3px solid #ffdd00;
+}
+.scp-horizontal-scroll[role=region][tabindex] > :last-child {
+  margin-bottom: 0;
+}
+ul.language-toggle {
+  text-align: right;
+  white-space: nowrap;
+}
+ul.language-toggle li {
+  display: inline-block;
+  padding-left: 1rem;
+  border-left: 0.1rem solid currentColor;
+  margin-left: 0.66rem;
+}
+ul.language-toggle li:first-child {
+  padding-left: 0;
+  border-left: none;
+  margin-left: 0;
+}
+.govuk-back-link {
+  top: -0.7rem; 
+}
+.govuk-back-link:first-child {
+  top: -0.05rem;
+}
+@media (max-width: 640px) {
+  .govuk-back-link {
+    top: unset;
+  }
+}
+.scp-navigation {
+  font-family: "GDS Transport", arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+@font-face {
+  font-family: "GDS Transport";
+  font-style: normal;
+  font-weight: normal;
+  src: url("/assets/fonts/light-94a07e06a1-v2.woff2") format("woff2"), url("/assets/fonts/light-f591b13f7d-v2.woff") format("woff");
+  font-display: fallback;
+}
+@font-face {
+  font-family: "GDS Transport";
+  font-style: normal;
+  font-weight: bold;
+  src: url("/assets/fonts/bold-b542beb274-v2.woff2") format("woff2"), url("/assets/fonts/bold-affa96571d-v2.woff") format("woff");
+  font-display: fallback;
+}
+@media print {
+  .scp-navigation {
+    font-family: sans-serif;
+  }
+}
+@media (min-width: 40.0625em) {
+  .scp-navigation {
+    font-size: 1.1875rem;
+    line-height: 1.3157894737;
+  }
+}
+@media print {
+  .scp-navigation {
+    font-size: 14pt;
+    line-height: 1.15;
+  }
+}
+.scp-navigation ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #b1b4b6;
+}
+@media (max-width: 640px) {
+  .scp-navigation ul {
+    margin: 2rem 0 4rem;
+  }
+}
+.scp-navigation ul li {
+  border-bottom: 1px solid #b1b4b6;
+}
+.scp-navigation ul li a {
+  color: #1d70b8;
+  display: block;
+  padding: 15px 20px 15px 5px;
+  text-underline-offset: 0.1578em;
+  position: relative;
+  font-family: "GDS Transport", arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, .0625rem);
+  text-underline-offset: 0.1578em;
+}
+@media print {
+  .scp-navigation ul li a {
+    font-family: sans-serif;
+  }
+}
+.scp-navigation ul li a:hover {
+  text-decoration-thickness: max(3px, .1875rem, .12em);
+  -webkit-text-decoration-skip-ink: none;
+  text-decoration-skip-ink: none;
+  -webkit-text-decoration-skip: none;
+  text-decoration-skip: none;
+}
+.scp-navigation ul li a:focus {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #ffdd00;
+  box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+  text-decoration: none;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.scp-navigation ul li a:hover {
+  background-color: #f3f2f1;
+  color: #003078;
+  text-decoration-thickness: max(3px, .1875rem, .12em);
+}
+.scp-navigation ul li a.active {
+  background-color: #1d70b8;
+  color: #ffffff;
+}
+.scp-navigation ul li a:focus {
+  background-color: #ffdd00;
+  color: #0b0c0c;
+  box-shadow: none;
+  text-decoration: underline;
+  text-decoration-thickness: max(3px, .1875rem, .12em);
+}
+@media (min-width: 641px) {
+  .scp-navigation ul li a::after {
+    font-size: 28px;
+    position: absolute;
+    top: 8px;
+    right: 5px;
+    content: "›";
+  }
+}
+@media (min-width: 641px) {
+  .scp-border-left {
+    border-left: 1px solid #b1b4b6;
+  }
+}
+.scp-\!-width-auto {
+  width: auto !important;
+}
+.search-input-with-button * {
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+.search-input {
+  padding: 0 0.33em;
+  width: 66%;
+  height: 50px;
+  border: 2px solid #0b0c0c;
+  border-right: 0;
+  margin-right: 50px;
+}
+@media (max-width: 641px) {
+  .search-input {
+    width: calc(100% - 54px);
+  }
+}
+.search-submit {
+  margin-left: -54px;
+  width: 50px;
+  height: 50px;
+  border: none;
+  overflow: hidden;
+  text-indent: 50px;
+  color: #ffffff;
+  background-color: #1d70b8;
+  background-image: url("/assets/images/search-button.png");
+  background-repeat: no-repeat;
+  background-position: -12.5% 50%;
+}
+.search-submit:hover {
+  background-color: #003078;
+}
+.search-submit:focus {
+  outline: 3px solid #ffdd00;
+}
+.search-input:focus + .search-submit {
+  box-shadow: 3px 3px 0 0 #ffdd00, 3px -3px 0 0 #ffdd00;
+}
