@@ -1,8 +1,0 @@
-Package: botan
-Version: 3.6.1
-Depends: vcpkg-cmake-config, vcpkg-cmake-get-vars
-Architecture: x64-linux
-Multi-Arch: same
-Abi: 570099dd273e2b669d760d7c08b748400298f20a570c24897125e41ed5f90c6d
-Description: A cryptography library written in C++11
-Status: install ok installed
