@@ -1,6 +1,7 @@
 {
   "dependencies": [
     "botan",
-    "drogon"
+    "drogon",
+    "flux"
   ]
 }

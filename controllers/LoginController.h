@@ -10,7 +10,7 @@ class LoginController : public drogon::HttpController<LoginController> {
                 drogon::Options);
   ADD_METHOD_TO(LoginController::Dashboard, "/api/dashboard", drogon::Get);
   ADD_METHOD_TO(LoginController::CreateAccount, "/api/createAccount",
-                drogon::Get);
+                drogon::Post, drogon::Options);
   METHOD_LIST_END
 
   void Login(drogon::HttpRequestPtr const &req,

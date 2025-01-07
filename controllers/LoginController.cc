@@ -4,11 +4,15 @@
 #include <botan/hex.h>
 #include <botan/pbkdf2.h>
 #include <json/json.h>
+#include <trantor/utils/Logger.h>
 
 #include <algorithm>
 #include <format>
+#include <iostream>
 #include <ostream>
 #include <print>
+#include <sstream>
+#include <stacktrace>
 #include <string>
 
 #include "../include/NotifyOfError.hpp"
@@ -32,7 +36,6 @@ void LoginController::Login(
   std::string Username = (*JsonBody)["username"].asString();
   std::string HashedPassword = (*JsonBody)["hashedPassword"].asString();
 
-  std::println("Stage 2");
   try {
     // Find user
     std::println("Stage 3.1");
@@ -42,7 +45,6 @@ void LoginController::Login(
           std::println("Time {}", ++Count);
           return user.GetUsername() == Username;
         });
-    std::println("Stage 3.2");
 
     if (UserIt != Users.end()) {
       // Verify password hash
@@ -57,7 +59,6 @@ void LoginController::Login(
 
         callback(Response);
         return;
-        std::println("Stage 4");
       }
     }
 
@@ -92,6 +93,7 @@ void LoginController::Dashboard(
 void LoginController::CreateAccount(
     drogon::HttpRequestPtr const &req,
     std::function<void(drogon::HttpResponsePtr const &)> &&callback) {
+  std::cout << "Start of account creation";
   if (!req->getJsonObject()) {
     ContactClientAboutError(
         std::format("Invalid json see error message{}", req->getJsonError()),
@@ -106,8 +108,8 @@ void LoginController::CreateAccount(
   UserJson["username"] = Username;
   UserJson["hashedPassword"] = HashedPassword;
   Users.AddUser(UserJson);
-  std::cout << UserJson;
 
+  std::cout << CreateContactJson(true, "Account creation successful");
   ContactClient(CreateContactJson(true, "Account creation successful"),
                 callback);
 }
