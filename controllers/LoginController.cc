@@ -17,6 +17,7 @@
 
 #include "../include/NotifyOfError.hpp"
 #include "../include/StoredUser.hpp"
+#include "../include/UserControls.hpp"
 
 // Demo user database (replace with real database in production)
 
@@ -39,7 +40,7 @@ void LoginController::Login(
   try {
     // Find user
     std::println("Stage 3.1");
-    std::println("{}", Users.m_UserData.size());
+    std::println("{}", std::size(gds::users::GetUsers()));
     auto UserIt = std::ranges::find_if(
         Users, [&Username, Count = 0](StoredUser &user) mutable {
           std::println("Time {}", ++Count);
@@ -107,8 +108,8 @@ void LoginController::CreateAccount(
   Json::Value UserJson;
   UserJson["username"] = Username;
   UserJson["hashedPassword"] = HashedPassword;
-  Users.AddUser(UserJson);
 
+  // TODO(Eugeniusz Lewandowski) add User db/control:
   std::cout << CreateContactJson(true, "Account creation successful");
   ContactClient(CreateContactJson(true, "Account creation successful"),
                 callback);

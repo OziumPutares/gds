@@ -4,21 +4,18 @@
 
 #include <algorithm>
 #include <array>
-#include <atomic>
-#include <chrono>
-#include <future>
+#include <cstddef>
 #include <initializer_list>
 #include <iostream>
 #include <iterator>
 #include <mutex>
-#include <numeric>
 #include <print>
-#include <ranges>
 #include <shared_mutex>
-#include <thread>
 #include <utility>
 #include <vector>
 
+namespace gds {
+namespace containers {
 template <typename T>
 class ScopeGuard {
   std::shared_mutex *m_Mutex;
@@ -69,13 +66,14 @@ class ScopeGuard {
   operator T() const { return m_Value; }
 };
 
-template <typename T,
-          template <typename, auto...> class Container = std::vector,
-          auto... Arguments>
+template <typename T, template <typename> class Container = std::vector>
+  requires requires(Container<T> data1, std::size_t Index, Container<T> data2) {
+    data1.size();
+    data1[Index];
+    std::swap(data1, data2);
+  }
 class AsyncronousContainerAdapter {
-  using ContainerType = Container<T, Arguments...>;
-  ContainerType m_Data;
-  mutable std::shared_mutex m_Mutex;
+  using ContainerType = Container<T>;
 
  public:
   class Iterator {
@@ -143,64 +141,82 @@ class AsyncronousContainerAdapter {
     }
   };
 
+ private:
+  ContainerType m_Data;
+  Iterator m_LastElementSet;
+  mutable std::shared_mutex m_Mutex;
+
+ public:
   // Constructors
-  constexpr AsyncronousContainerAdapter() = default;
+  constexpr AsyncronousContainerAdapter()
+      : m_Data(), m_LastElementSet(0, &m_Mutex, m_Data) {};
 
   constexpr AsyncronousContainerAdapter(std::initializer_list<T> init)
       : m_Data() {
+    auto lock = std::unique_lock(m_Mutex);
     std::copy(std::begin(init), std::end(init), std::begin(m_Data));
   }
 
-  template <typename... Args>
-  constexpr AsyncronousContainerAdapter(Args &&...args)
-      : m_Data(std::forward<Args>(args)...) {}
+  constexpr AsyncronousContainerAdapter(AsyncronousContainerAdapter &&other) {
+    auto lock = std::unique_lock(other.m_Mutex);
+    m_Data = std::move(other.m_Data);
+  }
+  constexpr AsyncronousContainerAdapter(
+      AsyncronousContainerAdapter const &other) {
+    auto lock1 = std::shared_lock(other.m_Mutex);
+    auto lock2 = std::shared_lock(m_Mutex);
+    m_Data = other.m_Data;
+  }
+  constexpr AsyncronousContainerAdapter &operator=(
+      AsyncronousContainerAdapter const &other) {
+    auto lock1 = std::shared_lock(other.m_Mutex);
+    auto lock2 = std::shared_lock(m_Mutex);
+    m_Data = other.m_Data;
+    return *this;
+  }
 
   // Iterator access
-  constexpr Iterator begin() { return Iterator(0, &m_Mutex, &m_Data); }
-  constexpr Iterator end() {
+  constexpr auto begin() -> Iterator { return Iterator(0, &m_Mutex, &m_Data); }
+  constexpr auto end() -> Iterator {
+    auto lock = std::shared_lock(m_Mutex);
     return Iterator(m_Data.size(), &m_Mutex, &m_Data);
   }
 
   // Modifiers
   template <typename... Args>
-  constexpr void emplace_back(Args &&...args) {
-    std::unique_lock lock(m_Mutex);
-    m_Data.emplace_back(std::forward<Args>(args)...);
+  constexpr auto emplace_back(Args &&...args) -> void {
+    push_back(T(args...));
   }
 
-  constexpr void push_back(T const &value) {
-    std::unique_lock lock(m_Mutex);
-    m_Data.push_back(value);
+  constexpr auto push_back(T const &value) -> void {
+    *m_LastElementSet = value;
+    m_LastElementSet++;
   }
 
-  constexpr void push_back(T &&value) {
-    std::unique_lock lock(m_Mutex);
+  constexpr auto push_back(T &&value) -> void {
+    std::unique_lock Lock(m_Mutex);
     m_Data.push_back(std::move(value));
   }
 
-  constexpr AsyncronousContainerAdapter &operator=(
-      std::initializer_list<T> ilist) {
-    std::unique_lock lock(m_Mutex);
-    m_Data = ilist;
+  constexpr auto operator=(std::initializer_list<T> ilist)
+      -> AsyncronousContainerAdapter & {
+    std::unique_lock Lock(m_Mutex);
+    std::ranges::copy(std::begin(ilist), std::end(ilist), std::begin(m_Data));
     return *this;
   }
 
-  constexpr void assign(std::size_t count, T const &value) {
-    std::unique_lock lock(m_Mutex);
-    m_Data.assign(count, value);
+  constexpr auto size() -> std::size_t {
+    std::shared_lock Lock(m_Mutex);
+    return m_Data.size();
   }
 
-  template <typename InputIt>
-  constexpr void assign(InputIt first, InputIt last) {
-    std::unique_lock lock(m_Mutex);
-    m_Data.assign(first, last);
-  }
-
-  constexpr void swap(AsyncronousContainerAdapter &other) noexcept {
+  constexpr auto swap(AsyncronousContainerAdapter &other) noexcept -> void {
     if (this != &other) {
-      std::scoped_lock lock(m_Mutex, other.m_Mutex);
-      m_Data.swap(other.m_Data);
+      std::scoped_lock Lock(m_Mutex, other.m_Mutex);
+      std::swap(m_Data, other.m_Data);
     }
   }
 };
+}  // namespace containers
+}  // namespace gds
 // NOLINTEND

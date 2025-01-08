@@ -7,7 +7,7 @@
 #include <ostream>
 #include <print>
 
-#include "include/StoredUser.hpp"
+#include "include/UserControls.hpp"
 
 auto main() -> int {
   // Configure Drogon app
