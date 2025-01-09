@@ -91,9 +91,22 @@ void LoginController::Dashboard(
     return;
   }
 
+  auto HtmlResponse = std::string{};
   auto Response = drogon::HttpResponse::newHttpResponse();
-  Response->setBody("<p>You are logged in as: " +
-                    Session->get<std::string>("username") + "</p>");
+  auto UserDataIter = std::find_if(
+      std::begin(gds::users::GetUsers()), std::end(gds::users::GetUsers()),
+      [Username = Session->get<std::string>("username")](StoredUser user) {
+        return user.GetUsername() == Username;
+      });
+  if (UserDataIter == std::end(gds::users::GetUsers())) {
+    Response->setBody(
+        std::format("<p>User {}</p>", Session->get<std::string>("username")));
+  }
+  StoredUser UserData = *UserDataIter;
+
+  Response->setBody(
+      std::format("<p>User {}</p>", Session->get<std::string>("username")) +
+      std::format("Data is: \n{}", UserData.m_Data["data"]));
 
   Response->setContentTypeCode(drogon::CT_TEXT_HTML);
   callback(Response);
