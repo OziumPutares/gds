@@ -8,7 +8,8 @@ class LoginController : public drogon::HttpController<LoginController> {
   // Remove initPathRouting since it's handled by the macro
   ADD_METHOD_TO(LoginController::Login, "/api/login", drogon::Post,
                 drogon::Options);
-  ADD_METHOD_TO(LoginController::Dashboard, "/api/dashboard", drogon::Get);
+  ADD_METHOD_TO(LoginController::Dashboard, "/api/dashboard", drogon::Get,
+                drogon::Post);
   ADD_METHOD_TO(LoginController::CreateAccount, "/api/createAccount",
                 drogon::Post, drogon::Options);
   METHOD_LIST_END

@@ -1,10 +1,13 @@
+#pragma once
 // NOLINTBEGIN
 #include <fmt/base.h>
 #include <fmt/format.h>
+#include <strings.h>
 
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <exception>
 #include <initializer_list>
 #include <iostream>
 #include <iterator>
@@ -76,6 +79,71 @@ class AsyncronousContainerAdapter {
   using ContainerType = Container<T>;
 
  public:
+  class ConstIterator {
+    using IterType = ConstIterator;
+    std::size_t m_Index;
+    std::shared_mutex *m_Mutex;
+    ContainerType *m_PointerToData;
+
+   public:
+    using iterator_category = std::input_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+    using value_type = T;
+    using pointer = T *;
+    using reference = ScopeGuard<T>;
+
+    constexpr ConstIterator(std::size_t index, std::shared_mutex *mutex,
+                            ContainerType *container)
+        : m_Index(index), m_Mutex(mutex), m_PointerToData(container) {}
+
+    // Iterator arithmetic operations
+    constexpr IterType &operator++() {
+      ++m_Index;
+      return *this;
+    }
+
+    constexpr IterType operator++(int) {
+      Iterator tmp = *this;
+      ++m_Index;
+      return tmp;
+    }
+
+    constexpr IterType &operator--() {
+      --m_Index;
+      return *this;
+    }
+
+    constexpr IterType operator--(int) {
+      Iterator tmp = *this;
+      --m_Index;
+      return tmp;
+    }
+
+    constexpr IterType operator+(difference_type n) const {
+      return IterType(m_Index + n, m_Mutex, m_PointerToData);
+    }
+
+    constexpr IterType operator-(difference_type n) const {
+      return IterType(m_Index - n, m_Mutex, m_PointerToData);
+    }
+
+    constexpr difference_type operator-(IterType const &other) const {
+      return m_Index - other.m_Index;
+    }
+
+    constexpr ScopeGuard<T> operator*() const {
+      return ScopeGuard<T>((*m_PointerToData)[m_Index], m_Mutex);
+    }
+
+    constexpr bool operator==(IterType const &other) const {
+      return m_PointerToData == other.m_PointerToData &&
+             m_Index == other.m_Index;
+    }
+
+    constexpr bool operator!=(IterType const &other) const {
+      return !(*this == other);
+    }
+  };
   class Iterator {
     std::size_t m_Index;
     std::shared_mutex *m_Mutex;
@@ -139,6 +207,9 @@ class AsyncronousContainerAdapter {
     constexpr bool operator!=(Iterator const &other) const {
       return !(*this == other);
     }
+    constexpr operator ConstIterator() {
+      return ConstIterator(m_Index, m_Mutex, m_PointerToData);
+    }
   };
 
  private:
@@ -149,29 +220,48 @@ class AsyncronousContainerAdapter {
  public:
   // Constructors
   constexpr AsyncronousContainerAdapter()
-      : m_Data(), m_LastElementSet(0, &m_Mutex, m_Data) {};
+      : m_Data(), m_LastElementSet(0, &m_Mutex, &m_Data), m_Mutex() {};
 
   constexpr AsyncronousContainerAdapter(std::initializer_list<T> init)
-      : m_Data() {
+      : m_Data(), m_LastElementSet(std::size(init) - 1, &m_Mutex, &m_Data) {
     auto lock = std::unique_lock(m_Mutex);
     std::copy(std::begin(init), std::end(init), std::begin(m_Data));
   }
 
-  constexpr AsyncronousContainerAdapter(AsyncronousContainerAdapter &&other) {
+  constexpr AsyncronousContainerAdapter(AsyncronousContainerAdapter &&other)
+      : m_LastElementSet(begin()) {
     auto lock = std::unique_lock(other.m_Mutex);
     m_Data = std::move(other.m_Data);
+    m_LastElementSet = std::move(other.m_LastElementSet);
   }
   constexpr AsyncronousContainerAdapter(
-      AsyncronousContainerAdapter const &other) {
+      AsyncronousContainerAdapter const &other)
+      : m_LastElementSet(begin()) {
     auto lock1 = std::shared_lock(other.m_Mutex);
     auto lock2 = std::shared_lock(m_Mutex);
     m_Data = other.m_Data;
+    m_LastElementSet = other.m_LastElementSet;
   }
-  constexpr AsyncronousContainerAdapter &operator=(
-      AsyncronousContainerAdapter const &other) {
+  constexpr auto operator=(std::initializer_list<T> ilist)
+      -> AsyncronousContainerAdapter & {
+    std::unique_lock Lock(m_Mutex);
+    std::ranges::copy(std::begin(ilist), std::end(ilist), std::begin(m_Data));
+    m_LastElementSet = Iterator(std::size(ilist) - 1, &m_Mutex, &m_Data);
+    return *this;
+  }
+  constexpr auto operator=(AsyncronousContainerAdapter &&other)
+      -> AsyncronousContainerAdapter & {
+    auto lock = (std::unique_lock(other.m_Mutex), std::unique_lock(m_Mutex));
+    m_Data = std::move(other.m_Data);
+    m_LastElementSet = std::move(other.m_LastElementSet);
+    return *this;
+  }
+  constexpr auto operator=(AsyncronousContainerAdapter const &other)
+      -> AsyncronousContainerAdapter & {
     auto lock1 = std::shared_lock(other.m_Mutex);
-    auto lock2 = std::shared_lock(m_Mutex);
+    auto lock2 = std::unique_lock(m_Mutex);
     m_Data = other.m_Data;
+    m_LastElementSet = other.m_LastElementSet;
     return *this;
   }
 
@@ -189,20 +279,12 @@ class AsyncronousContainerAdapter {
   }
 
   constexpr auto push_back(T const &value) -> void {
-    *m_LastElementSet = value;
-    m_LastElementSet++;
-  }
-
-  constexpr auto push_back(T &&value) -> void {
     std::unique_lock Lock(m_Mutex);
-    m_Data.push_back(std::move(value));
-  }
-
-  constexpr auto operator=(std::initializer_list<T> ilist)
-      -> AsyncronousContainerAdapter & {
-    std::unique_lock Lock(m_Mutex);
-    std::ranges::copy(std::begin(ilist), std::end(ilist), std::begin(m_Data));
-    return *this;
+    try {
+      m_Data.push_back(value);
+    } catch (std::exception &e) {
+      std::cerr << e.what();
+    }
   }
 
   constexpr auto size() -> std::size_t {

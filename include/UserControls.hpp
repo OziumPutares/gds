@@ -1,4 +1,10 @@
+#pragma once
+#include <exception>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <mutex>
+#include <ostream>
 
 #include "StoredUser.hpp"
 
@@ -13,19 +19,29 @@ inline auto SetUsers(StoredUsers const& newDefualt) -> void {
   DefualtValue = newDefualt;
 }
 // Function that loads users from predefined path (usually ./data/*)
-inline auto LoadUsers(std::filesystem::path const& location, StoredUsers users)
-    -> StoredUsers {
+inline auto LoadUsers(std::filesystem::path const& location) -> void {
   assert(std::filesystem::is_directory(location));
-  for (auto&& File : location) {
-    users.emplace_back(Json::Value(File.string()));
-  };
-  return std::move(users);
+  std::println("Path {}", location.string());
+  for (auto&& File : std::filesystem::directory_iterator(location)) {
+    if (!File.is_regular_file()) continue;
+    try {
+      std::cout << File.path().string();
+      std::cout << '\n';
+      auto Tmp = Json::Value{};
+      std::ifstream(File.path(), std::ifstream::binary) >> Tmp;
+      std::println("Parsed Json adding user json");
+      gds::users::GetUsers().emplace_back(Tmp);
+    } catch (std::exception const& Error) {
+      std::cerr << "An exception was thrown: \n" << Error.what();
+      std::cout << "The corresponding json:\n "
+                << std::ifstream(File.path()).rdbuf();
+    }
+  }
 }
-inline void SaveUsers(std::filesystem::path const& location) {
+inline auto SaveUsers(std::filesystem::path const& location) -> void {
   assert(std::filesystem::is_directory(location));
-  for (auto&& User : Users) {
-    std::ofstream((location / (User.m_Data["username"]).asString()).string())
-        << User.m_Data;
+  for (StoredUser&& User : GetUsers()) {
+    std::ofstream(location / (User.GetUsername())) << User.m_Data;
   }
 }
 }  // namespace gds::users

@@ -7,8 +7,10 @@
 #include <trantor/utils/Logger.h>
 
 #include <algorithm>
+#include <filesystem>
 #include <format>
 #include <iostream>
+#include <iterator>
 #include <ostream>
 #include <print>
 #include <sstream>
@@ -40,16 +42,18 @@ void LoginController::Login(
   try {
     // Find user
     std::println("Stage 3.1");
-    std::println("{}", std::size(gds::users::GetUsers()));
-    auto UserIt = std::ranges::find_if(
-        Users, [&Username, Count = 0](StoredUser &user) mutable {
-          std::println("Time {}", ++Count);
-          return user.GetUsername() == Username;
-        });
+    std::println("{}", gds::users::GetUsers().size());
+    auto &Users = gds::users::GetUsers();
+    auto UserIt = std::find_if(std::begin(Users), std::end(Users),  // NOLINT
+                               [&Username, Count = 0](StoredUser user) mutable {
+                                 std::println("Time {}", ++Count);
+                                 return user.GetUsername() == Username;
+                               });
 
-    if (UserIt != Users.end()) {
+    if (UserIt != gds::users::GetUsers().end()) {
       // Verify password hash
-      if (UserIt->VerifyPassword(Username, HashedPassword, "mixed_salt")) {
+      if (StoredUser(*UserIt).VerifyPassword(Username, HashedPassword,
+                                             "mixed_salt")) {
         Result["success"] = true;
         Result["message"] = "Login successful";
 
@@ -64,8 +68,11 @@ void LoginController::Login(
     }
 
     // If we get here, login failed
-    std::println("Stage 4");
     ContactClientAboutError("Invalid credentials", callback);
+    std::cout << "List of users is";
+    for (StoredUser &&User : gds::users::GetUsers()) {
+      std::cout << User.m_Data;
+    }
   } catch (std::exception const &Expception) {
     ContactClientAboutError(
         std::format("Server error during login: {}", Expception.what()),
@@ -87,6 +94,7 @@ void LoginController::Dashboard(
   auto Response = drogon::HttpResponse::newHttpResponse();
   Response->setBody("<p>You are logged in as: " +
                     Session->get<std::string>("username") + "</p>");
+
   Response->setContentTypeCode(drogon::CT_TEXT_HTML);
   callback(Response);
 }
@@ -104,10 +112,15 @@ void LoginController::CreateAccount(
   auto JsonFromClient = req->getJsonObject();
   std::string Username = (*JsonFromClient)["username"].asString();
   std::string HashedPassword = (*JsonFromClient)["hashedPassword"].asString();
+  std::string Salt = (*JsonFromClient)["salt"].asString();
 
   Json::Value UserJson;
   UserJson["username"] = Username;
   UserJson["hashedPassword"] = HashedPassword;
+  UserJson["salt"] = Salt;
+  UserJson["data"] = {};
+  gds::users::GetUsers().emplace_back(UserJson);
+  gds::users::SaveUsers(std::filesystem::current_path() / "data");
 
   // TODO(Eugeniusz Lewandowski) add User db/control:
   std::cout << CreateContactJson(true, "Account creation successful");

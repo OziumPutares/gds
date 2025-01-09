@@ -1,168 +1,193 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="govuk-template js-enabled">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Account</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b0c0c" />
+    <title>Create Government Gateway account - GOV.UK</title>
+
+    <link rel="icon" sizes="48x48" href="assets/images/favicon.ico" />
+    <link
+      rel="icon"
+      sizes="any"
+      href="assets/images/favicon.svg"
+      type="image/svg+xml"
+    />
+    <link
+      rel="mask-icon"
+      href="assets/images/govuk-icon-mask.svg"
+      color="#0b0c0c"
+    />
+
+    <link rel="stylesheet" href="login/css/govuk-frontend.min.css" />
+    <link rel="stylesheet" href="login/css/scp.css" />
+
     <style>
-      /* Matching the style of our login page for consistency */
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f2f5;
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      /* Add GDS Transport font */
+      @font-face {
+        font-family: "GDS Transport";
+        src:
+          url("path-to-font/GDS-Transport.woff2") format("woff2"),
+          url("path-to-font/GDS-Transport.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
       }
 
-      .container {
-        width: 100%;
-        max-width: 400px;
+      /* Apply styles to error messages */
+      .error-message {
         padding: 20px;
-      }
-
-      .create-account-form {
-        background: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      h2 {
-        text-align: center;
-        margin-bottom: 30px;
-        color: #1a73e8;
-      }
-
-      .form-group {
-        margin-bottom: 20px;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 8px;
-        color: #333;
-      }
-
-      input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 16px;
-      }
-
-      .password-requirements {
-        font-size: 12px;
-        color: #666;
-        margin-top: 5px;
-      }
-
-      .error,
-      .success {
-        padding: 10px;
-        border-radius: 4px;
-        margin-bottom: 20px;
-        text-align: center;
-      }
-
-      .error {
-        background-color: #ffebee;
-        color: #c62828;
-      }
-
-      .success {
-        background-color: #e8f5e9;
-        color: #2e7d32;
-      }
-
-      .hidden {
-        display: none;
-      }
-
-      button {
-        width: 100%;
-        padding: 12px;
-        background-color: #1a73e8;
+        background: #d4351c;
         color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background-color 0.2s;
+        margin-bottom: 20px;
+        font-family: "GDS Transport", Arial, sans-serif; /* Apply GDS Transport font */
+        font-size: 1rem;
+        border: 4px solid black; /* Add bold black border */
+        box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.1); /* Optional: slight shadow for depth */
       }
 
-      button:hover {
-        background-color: #1557b0;
-      }
-
-      .login-link {
-        text-align: center;
-        margin-top: 20px;
-      }
-
-      .login-link a {
-        color: #1a73e8;
-        text-decoration: none;
-      }
-
-      .login-link a:hover {
-        text-decoration: underline;
+      .success-message {
+        padding: 20px;
+        background: #00703c;
+        color: white;
+        margin-bottom: 20px;
+        border: 4px solid black; /* Add bold black border */
+        box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.1); /* Optional: slight shadow for depth */
       }
     </style>
   </head>
-  <body>
-    <div class="container">
-      <div class="create-account-form">
-        <h2>Create Account</h2>
-        <div id="message" class="hidden"></div>
-        <form id="createAccountForm">
-          <div class="form-group">
-            <label for="username">Username</label>
+
+  <body class="govuk-template__body govuk-frontend-supported">
+    <!-- Header same as before -->
+    <header class="govuk-header" role="banner">
+      <div class="govuk-header__container govuk-width-container">
+        <div class="govuk-header__logo">
+          <a
+            href="https://www.gov.uk"
+            class="govuk-header__link govuk-header__link--homepage"
+          >
+            <svg
+              role="img"
+              focusable="false"
+              class="govuk-header__logotype"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 148 30"
+              height="30"
+              width="148"
+              aria-label="GOV.UK"
+            >
+              <title>GOV.UK</title>
+              <path d="..."></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="govuk-width-container">
+      <main
+        class="govuk-main-wrapper govuk-!-padding-top-4"
+        id="main-content"
+        role="main"
+      >
+        <h1 class="govuk-heading-xl">Create Government Gateway account</h1>
+
+        <div id="message" class="hidden" role="alert" tabindex="-1">
+          <span id="message-text"></span>
+        </div>
+
+        <!-- Form same as before -->
+        <form id="createAccountForm" method="POST">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="username">Username</label>
+            <div class="govuk-hint">Must be at least 3 characters long.</div>
             <input
-              type="text"
+              class="govuk-input govuk-!-width-one-half"
               id="username"
               name="username"
+              type="text"
               required
               minlength="3"
             />
           </div>
-          <div class="form-group">
-            <label for="password">Password</label>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="password">Password</label>
+            <div class="govuk-hint">Must be at least 8 characters long.</div>
             <input
-              type="password"
+              class="govuk-input govuk-!-width-one-half govuk-password-input__input"
               id="password"
               name="password"
+              type="password"
               required
               minlength="8"
             />
-            <div class="password-requirements">
-              Password must be at least 8 characters long
-            </div>
           </div>
-          <div class="form-group">
-            <label for="confirmPassword">Confirm Password</label>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="confirmPassword"
+              >Confirm password</label
+            >
             <input
-              type="password"
+              class="govuk-input govuk-!-width-one-half govuk-password-input__input"
               id="confirmPassword"
               name="confirmPassword"
+              type="password"
               required
             />
           </div>
-          <button type="submit">Create Account</button>
+
+          <button type="submit" class="govuk-button govuk-!-margin-top-3">
+            Create account
+          </button>
         </form>
-        <div class="login-link">
-          Already have an account? <a href="/login">Login here</a>
+
+        <p class="govuk-body">
+          Already have an account?
+          <a href="/login" class="govuk-link">Sign in</a>
+        </p>
+      </main>
+    </div>
+
+    <!-- Footer same as before -->
+    <footer class="govuk-footer" role="contentinfo">
+      <div class="govuk-width-container">
+        <div class="govuk-footer__meta">
+          <ul class="govuk-footer__inline-list">
+            <li class="govuk-footer__inline-list-item">
+              <a href="/accessibility" class="govuk-footer__link"
+                >Accessibility</a
+              >
+            </li>
+            <li class="govuk-footer__inline-list-item">
+              <a href="/cookies" class="govuk-footer__link">Cookies</a>
+            </li>
+            <li class="govuk-footer__inline-list-item">
+              <a href="/privacy" class="govuk-footer__link">Privacy</a>
+            </li>
+            <li class="govuk-footer__inline-list-item">
+              <a href="/terms" class="govuk-footer__link">Terms</a>
+            </li>
+          </ul>
+          <span class="govuk-footer__licence-description">
+            All content is available under the
+            <a
+              href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+              class="govuk-footer__link"
+              >Open Government Licence v3.0</a
+            >, except where otherwise stated.
+          </span>
         </div>
       </div>
-    </div>
+    </footer>
+
     <script>
-      // Utility function to hash passwords using Web Crypto API
       async function hashPassword(password, salt) {
         const encoder = new TextEncoder();
         const saltedPassword = `${password}${salt}`;
         const data = encoder.encode(saltedPassword);
-
         const hashBuffer = await crypto.subtle.digest("SHA-256", data);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
@@ -171,12 +196,19 @@
       document.addEventListener("DOMContentLoaded", () => {
         const createAccountForm = document.getElementById("createAccountForm");
         const messageElement = document.getElementById("message");
+        const messageTextElement = document.getElementById("message-text");
         const salt = "demofixed_salt";
 
         function showMessage(text, isError = false) {
-          messageElement.textContent = text;
-          messageElement.classList.remove("hidden", "success", "error");
-          messageElement.classList.add(isError ? "error" : "success");
+          messageTextElement.textContent = text;
+          messageElement.classList.remove(
+            "hidden",
+            "success-message",
+            "error-message",
+          );
+          messageElement.classList.add(
+            isError ? "error-message" : "success-message",
+          );
         }
 
         createAccountForm.addEventListener("submit", async (e) => {
@@ -193,17 +225,8 @@
           }
 
           try {
-            // Log the request being sent
-            console.log("Sending account creation request...");
-
             const hashedPassword = await hashPassword(password, salt);
-            const requestBody = {
-              username,
-              hashedPassword,
-              salt,
-            };
-
-            console.log("Request body:", requestBody);
+            const requestBody = { username, hashedPassword, salt };
 
             const response = await fetch("/api/createAccount", {
               method: "POST",
@@ -214,26 +237,13 @@
               body: JSON.stringify(requestBody),
             });
 
-            // Log the raw response
-            console.log("Response status:", response.status);
-            console.log(
-              "Response headers:",
-              Object.fromEntries(response.headers),
-            );
-
-            // Get the raw text first
             const rawText = await response.text();
-            console.log("Raw response:", rawText);
-
-            // Try to parse as JSON if possible
             let data;
             try {
               data = JSON.parse(rawText);
-              console.log("Parsed JSON response:", data);
             } catch (parseError) {
-              console.error("JSON parse error:", parseError);
               showMessage(
-                "Server returned invalid response format. Check console for details.",
+                "Server returned invalid response format. Please try again later.",
                 true,
               );
               return;
@@ -241,7 +251,7 @@
 
             if (data.success) {
               showMessage(
-                "Account created successfully! Redirecting to login...",
+                "Account created successfully! Redirecting to sign in page...",
               );
               setTimeout(() => {
                 window.location.href = "/login";
@@ -250,7 +260,6 @@
               showMessage(data.message || "Failed to create account", true);
             }
           } catch (error) {
-            console.error("Account creation error:", error);
             showMessage(`Error: ${error.message}`, true);
           }
         });

@@ -1,3 +1,4 @@
+#pragma once
 #include <drogon/HttpController.h>
 #include <drogon/HttpTypes.h>
 #include <drogon/drogon.h>
@@ -5,7 +6,6 @@
 
 #include <iostream>
 #include <string>
-#include <utility>
 
 inline auto CreateContactJson(bool isSuccessful,
                               std::string const &message) -> Json::Value {

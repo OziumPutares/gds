@@ -1,18 +1,21 @@
+#pragma once
 #include <json/value.h>
 #include <strings.h>
 
 #include <cassert>
+#include <exception>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
 #include "AsynchronousContainerAbstraction.hpp"
 
 struct StoredUser {
+ public:
   Json::Value m_Data;
-  [[nodiscard]] auto VerifyPassword(std::string const& username,
-                                    std::string const& hashedPassword,
-                                    std::string const& /*salt*/) noexcept
-      -> bool {
+  [[nodiscard]] auto VerifyPassword(
+      std::string const& username, std::string const& hashedPassword,
+      std::string const& /*salt*/) noexcept -> bool {
     return m_Data["hashedPassword"] == hashedPassword &&
            m_Data["username"] == username;
   }
@@ -28,10 +31,18 @@ struct StoredUser {
     m_Data["data"] = std::move(userData);
   }
   explicit StoredUser(Json::Value value) : m_Data(std::move(value)) {
-    if (m_Data["username"].empty()) throw "User must have username";
-    if (m_Data["hashedPassword"].empty()) throw "User must have hashedPassword";
-    if (m_Data["salt"].empty()) throw "User must have salt";
-    if (m_Data["data"].empty()) throw "User must have data";
+    // if (m_Data["username"].empty()) {
+    //   throw std::invalid_argument("User must have username\n");
+    // }
+    // if (m_Data["hashedPassword"].empty()) {
+    //   throw std::invalid_argument("User must have hashedPassword\n");
+    // }
+    // if (m_Data["salt"].empty()) {
+    //   throw std::invalid_argument("User must have salt\n");
+    // }
+    // if (m_Data["data"].empty()) {
+    //   throw std::invalid_argument("User must have data\n");
+    // }
   }
 };
 
