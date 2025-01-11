@@ -2,10 +2,8 @@ async function hashPassword(password, salt) {
     const encoder = new TextEncoder();
     const saltedPassword = `${password}${salt}`;
     const data = encoder.encode(saltedPassword);
-
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    console.log(hashArray.map(b => b.toString(16).padStart(2, '0')).join(''));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
@@ -17,13 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
         try {
             const hashedPassword = await hashPassword(password, salt);
-
             const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: {
@@ -32,12 +28,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     username,
                     hashedPassword,
-                    salt
-                })
+                    salt,
+                    // Add session data to be stored on the server
+                    sessionData: {
+                        username,
+                        hashedPassword,
+                        salt
+                    }
+                }),
+                // Ensure credentials are included to maintain session cookies
+                credentials: 'include'
             });
 
             const data = await response.json();
-
             if (data.success) {
                 errorMessage.textContent = 'Login successful!';
                 errorMessage.classList.remove('error');
@@ -76,4 +79,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-

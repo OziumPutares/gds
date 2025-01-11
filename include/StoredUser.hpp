@@ -14,15 +14,19 @@
 struct StoredUser {
  public:
   Json::Value m_Data;
-  [[nodiscard]] auto VerifyPassword(std::string const& username,
-                                    std::string const& hashedPassword,
-                                    std::string const& /*salt*/) noexcept
-      -> bool {
+  [[nodiscard]] auto VerifyPassword(
+      std::string const& username, std::string const& hashedPassword,
+      std::string const& /*salt*/) noexcept -> bool {
     return m_Data["hashedPassword"] == hashedPassword &&
            m_Data["username"] == username;
   }
-  auto GetUsername() -> std::string { return m_Data["username"].asString(); }
-  [[nodiscard]] auto GetHashedPassword() const -> std::string {
+  [[nodiscard]] auto GetData() const noexcept -> Json::Value {
+    return m_Data["data"];
+  }
+  [[nodiscard]] auto GetUsernameThrows() -> std::string {
+    return m_Data["username"].asString();
+  }
+  [[nodiscard]] auto GetHashedPasswordThrows() const -> std::string {
     return m_Data["hashedPassword"].asString();
   }
   StoredUser(std::string const& username, std::string const& hashedPassword,
@@ -32,6 +36,7 @@ struct StoredUser {
     m_Data["salt"] = salt;
     m_Data["data"] = std::move(userData);
   }
+
   explicit StoredUser(Json::Value value) : m_Data(std::move(value)) {
     if (m_Data["username"].empty()) {
       throw std::invalid_argument("User must have username\n");
@@ -59,7 +64,6 @@ class std::formatter<StoredUser> {
     return format_to(ctx.out(), "({})", (user.m_Data));
   }
 };
-;
 
 // Define alias for storing users to abstract the process away
 using StoredUsers = gds::containers::AsyncronousContainerAdapter<StoredUser>;

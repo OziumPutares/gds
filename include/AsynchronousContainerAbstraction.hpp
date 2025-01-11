@@ -17,58 +17,16 @@
 #include <utility>
 #include <vector>
 
-namespace gds {
-namespace containers {
-template <typename T>
-class ScopeGuard {
-  std::shared_mutex *m_Mutex;
-  T &m_Value;
+#include "ScopeGuard.hpp"
 
- public:
-  ScopeGuard(T &valueToStore, std::shared_mutex *mutex)
-      : m_Value(valueToStore), m_Mutex{mutex} {}
+namespace gds::containers {
 
-  ~ScopeGuard() {}
-
-  // Prevent copying
-  ScopeGuard(ScopeGuard const &) = delete;
-  ScopeGuard &operator=(ScopeGuard const &) = delete;
-
-  // Allow moving
-  ScopeGuard(ScopeGuard &&other) noexcept
-      : m_Value(other.m_Value), m_Mutex(other.m_Mutex) {
-    other.m_Mutex = nullptr;  // Prevent double unlock
-  }
-
-  friend std::ostream &operator<<(std::ostream &os, ScopeGuard const &guard) {
-    os << guard.m_Value;
-    return os;
-  }
-
-  ScopeGuard &operator=(T &&value) {
-    std::unique_lock<std::shared_mutex> lock(*m_Mutex);
-    m_Value = std::move(value);
-    return *this;
-  }
-
-  ScopeGuard &operator=(T const &value) {
-    std::unique_lock<std::shared_mutex> lock(*m_Mutex);
-    m_Value = value;
-    return *this;
-  }
-  ScopeGuard &operator+(T const &value) {
-    std::unique_lock<std::shared_mutex> lock(*m_Mutex);
-    m_Value += value;
-    return *this;
-  }
-  auto operator+=(T const &value) -> void {
-    std::unique_lock<std::shared_mutex> lock(*m_Mutex);
-    m_Value += value;
-  }
-
-  operator T() const { return m_Value; }
-};
-
+/**
+ * @brief Thread safe container wrapper
+ * @template param: 1. Type to be stored in container 2. Container where the
+ * only unfulfilled arg is the type
+ * @note Uses ScopeGuard<T> to allow for RAII based locking of references
+ */
 template <typename T, template <typename> class Container = std::vector>
   requires requires(Container<T> data1, std::size_t Index, Container<T> data2) {
     data1.size();
@@ -210,6 +168,7 @@ class AsyncronousContainerAdapter {
     constexpr operator ConstIterator() {
       return ConstIterator(m_Index, m_Mutex, m_PointerToData);
     }
+    [[nodiscard]] constexpr auto GetIndex() -> std::size_t { return m_Index; }
   };
 
  private:
@@ -291,6 +250,10 @@ class AsyncronousContainerAdapter {
     std::shared_lock Lock(m_Mutex);
     return m_Data.size();
   }
+  constexpr auto erase(Iterator iter) -> void {
+    std::unique_lock Lock(m_Mutex);
+    m_Data.erase(std::begin(m_Data) + iter.GetIndex());
+  }
 
   constexpr auto swap(AsyncronousContainerAdapter &other) noexcept -> void {
     if (this != &other) {
@@ -299,6 +262,5 @@ class AsyncronousContainerAdapter {
     }
   }
 };
-}  // namespace containers
-}  // namespace gds
+}  // namespace gds::containers
 // NOLINTEND

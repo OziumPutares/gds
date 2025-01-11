@@ -40,8 +40,10 @@ inline auto LoadUsers(std::filesystem::path const& location) -> void {
 }
 inline auto SaveUsers(std::filesystem::path const& location) -> void {
   assert(std::filesystem::is_directory(location));
-  for (StoredUser&& User : GetUsers()) {
-    std::ofstream(location / (User.GetUsername())) << User.m_Data;
+  std::cout << "Saving users";
+  for (StoredUser User : GetUsers()) {
+    std::ofstream(location / (User.GetUsernameThrows())) << User.m_Data;
+    std::cout << User.m_Data;
   }
 }
 }  // namespace gds::users
