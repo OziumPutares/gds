@@ -51,6 +51,7 @@ void LoginController::Login(
       // Verify password hash
       if (StoredUser(*UserIt).VerifyPassword(Username, HashedPassword,
                                              "mixed_salt")) {
+        req->session()->clear();
         Result["success"] = true;
         Result["message"] = "Login successful";
 
