@@ -50,7 +50,7 @@ inline auto LoadUsers(std::filesystem::path const& location) -> void {
       LOG_DEBUG << (std::format("Processing file: {}", File.path().string()));
       auto Tmp = Json::Value{};
       std::ifstream(File.path(), std::ifstream::binary) >> Tmp;
-      LOG_DEBUG << ("Successfully parsed JSON, adding user");
+      LOG_DEBUG << std::format("Successfully parsed JSON, adding user {}", Tmp);
       gds::users::GetUsers().emplace_back(Tmp);
     } catch (std::exception const& Error) {
       std::string FileContent;
@@ -63,6 +63,12 @@ inline auto LoadUsers(std::filesystem::path const& location) -> void {
           File.path().string(), Error.what(), FileContent));
     }
   }
+
+  std::string UserList;
+  for (auto&& User : gds::users::GetUsers()) {
+    UserList += std::format("{}", User);
+  }
+  LOG_DEBUG << UserList;
 }
 
 /**

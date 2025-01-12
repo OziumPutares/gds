@@ -32,6 +32,7 @@ template <typename T, template <typename> class Container = std::vector>
     data1.size();
     data1[Index];
     std::swap(data1, data2);
+    data1.at(Index);
   }
 class AsyncronousContainerAdapter {
   using ContainerType = Container<T>;
@@ -101,6 +102,10 @@ class AsyncronousContainerAdapter {
     constexpr bool operator!=(IterType const &other) const {
       return !(*this == other);
     }
+
+    [[nodiscard]] constexpr auto GetIndex() const -> std::size_t {
+      return m_Index;
+    }
   };
   class Iterator {
     std::size_t m_Index;
@@ -168,7 +173,9 @@ class AsyncronousContainerAdapter {
     constexpr operator ConstIterator() {
       return ConstIterator(m_Index, m_Mutex, m_PointerToData);
     }
-    [[nodiscard]] constexpr auto GetIndex() -> std::size_t { return m_Index; }
+    [[nodiscard]] constexpr auto GetIndex() const -> std::size_t {
+      return m_Index;
+    }
   };
 
  private:
@@ -260,6 +267,46 @@ class AsyncronousContainerAdapter {
       std::scoped_lock Lock(m_Mutex, other.m_Mutex);
       std::swap(m_Data, other.m_Data);
     }
+  }
+  [[nodiscard]] constexpr auto at(ConstIterator const &location) noexcept -> T {
+    std::shared_lock Lock(m_Mutex);
+    return m_Data.at(location.GetIndex());
+  }
+  [[nodiscard]] constexpr auto at(Iterator const &location) noexcept -> T {
+    std::shared_lock Lock(m_Mutex);
+    return m_Data.at(location.GetIndex());
+  }
+  [[nodiscard]] constexpr auto at(std::size_t index) noexcept -> T {
+    std::shared_lock Lock(m_Mutex);
+    return m_Data.at(index);
+  }
+
+  constexpr auto set(Iterator const &location,
+                     T const &value) noexcept -> void {
+    std::unique_lock Lock(m_Mutex);
+    m_Data[location.GetIndex()] = value;
+  }
+  constexpr auto set(ConstIterator const &location,
+                     T const &value) noexcept -> void {
+    std::unique_lock Lock(m_Mutex);
+    m_Data[location.GetIndex()] = value;
+  }
+  constexpr auto set(std::size_t Index, T const &value) noexcept -> void {
+    std::unique_lock Lock(m_Mutex);
+    m_Data[Index] = value;
+  }
+  constexpr auto set(Iterator const &location, T &&value) noexcept -> void {
+    std::unique_lock Lock(m_Mutex);
+    m_Data[location.GetIndex()] = std::move(value);
+  }
+  constexpr auto set(ConstIterator const &location,
+                     T &&value) noexcept -> void {
+    std::unique_lock Lock(m_Mutex);
+    m_Data[location.GetIndex()] = std::move(value);
+  }
+  constexpr auto set(std::size_t Index, T &&value) noexcept -> void {
+    std::unique_lock Lock(m_Mutex);
+    m_Data[Index] = std::move(value);
   }
 };
 }  // namespace gds::containers

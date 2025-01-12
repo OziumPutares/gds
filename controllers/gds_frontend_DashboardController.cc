@@ -1,10 +1,12 @@
 #include "gds_frontend_DashboardController.h"
 
 #include <json/value.h>
+#include <trantor/utils/Logger.h>
 
 #include <algorithm>
 #include <filesystem>
 #include <format>
+#include <iostream>
 #include <iterator>
 #include <ostream>
 #include <string>
@@ -56,14 +58,16 @@ auto gds::frontend::DashboardController::AddData(
     }
     StoredUser Tmp = *UserToEdit;
     Tmp.m_Data["data"][Key] = Value;
-    *UserToEdit = Tmp;
-    Users.erase(UserToEdit);
-    Users.push_back(Tmp);
+    Users.set(UserToEdit, Tmp);
     // std::println("{}", static_cast<StoredUser>(*UserToEdit));
     Session->erase("data");
     Session->insert("data", static_cast<StoredUser>(*UserToEdit).GetData());
     // std::println("{}", Session->get<Json::Value>("data"));
     gds::users::SaveUsers(std::filesystem::current_path() / "data");
+    std::cout << std::format("User data is:\n{}", Tmp);
+    for (auto &&User : Users) {
+      std::cout << std::format("{},", Tmp);
+    }
 
   } catch (Json::Exception &Error) {
     ContactClientAboutError(

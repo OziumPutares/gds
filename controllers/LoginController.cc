@@ -111,6 +111,8 @@ void LoginController::CreateAccount(
   UserJson["data"] = {};
   gds::users::GetUsers().emplace_back(UserJson);
   gds::users::SaveUsers(std::filesystem::current_path() / "data");
+  // REset session
+  req->session()->clear();
 
   // TODO(Eugeniusz Lewandowski) add User db/control:
   std::cout << CreateContactJson(true, "Account creation successful");
